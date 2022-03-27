@@ -1,0 +1,85 @@
+function custom_woo_reviews_summary($id) {
+    ?>
+
+
+<div class="customer_review_top_section">
+    <h3>CUSTOMER REVIEWS</h3>
+    <div class="flex-review-section">
+        <div class="basedon_review">
+    <?php 
+    global $product;
+    // echo "<pre>";
+    // print_r($product);
+    // echo "</pre>";
+    $rating_count = $product->get_rating_count();
+    $review_count = $product->get_review_count();
+    $average = $product->get_average_rating();
+    if ( $rating_count > 0 ) : ?>
+            <div class="woocommerce-product-rating">
+                <div class="left_review_top clearfix">
+                    <span class="avg"><?php echo $average; ?></span>
+                    <?php echo wc_get_rating_html( $average, $rating_count ); // WPCS: XSS ok. ?>
+                </div>
+                <?php if ( comments_open() ) : ?>
+                    <?php //phpcs:disable ?>
+                    <a href="#reviews" class="woocommerce-review-link" rel="nofollow"><?php printf( _n( 'Based on %s Review', 'Based on %s Reviews', $review_count, 'woocommerce' ), '<span class="count">' . esc_html( $review_count ) . '</span>' ); ?><br></a>
+                    <?php // phpcs:enable ?>
+                <?php endif ?>
+            </div>
+        <?php endif; ?> 
+
+</div>
+
+<?php 
+ $get_rating_count = get_post_meta( $id, '_wc_rating_count', true );
+    $get_review_count   = get_post_meta( $id, '_wc_review_count', true );
+    $get_rating_text = array(
+        '5' => 'Perfect',
+        '4' => 'Good',
+        '3' => 'Average',
+        '2' => 'Not that bad',
+        '1' => 'Very poor',
+    );
+ ?>
+    <div class="product-summary-rev">
+        <?php
+        for ( $i = 5; $i > 0 ; $i-- ) {
+            if ( !isset( $get_rating_count[$i] ) ) {
+                $get_rating_count[$i] = 0;
+            }
+            $percentage = 0 ;
+            if ( $get_rating_count[$i] > 0 ) {
+                $percentage = round( ( $get_rating_count[$i] / $get_review_count ) * 100 );
+            }
+            ?>
+            <div class="ps-right-flex">
+                <div class="rating-stars">
+                    <div class="stars" title="<?php echo $get_rating_text[$i]; ?>"><?php echo wc_get_rating_html( $i ); ?></div>
+                </div>
+                <div class="rating-graph" title="<?php printf( '%s%%', $percentage ); ?>">
+                    <div class="percentage" style="width: <?php echo $percentage; ?>%" class="bar"></div>
+                </div>
+                <div class="rating-count-ps">
+                    <?php echo $percentage; ?>%
+                    <!-- <div class="count"><?php //echo '(' . $get_rating_count[$i] . ')' ?></div> -->
+                </div>
+            </div> <?php
+        } ?>
+    </div>
+    </div>
+     <div class="recom">
+         <span class="per2"><?php 
+        $total_count = $review_count;
+        $tav = 5; 
+        $avg_rating = $average;
+
+        $sum = $total_count * $tav;
+        $total = $avg_rating * $total_count;
+        $final = $total/$sum*100;
+        echo $final;
+      ?>%</span> reviewers would recommend this product
+     </div>
+</div>
+
+<?php
+}
